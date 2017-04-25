@@ -46,17 +46,19 @@ def neuron_population(I, J_exc, J_inh, b, N, time):
     for n in inh_neurons:
         nest.Connect([n], spike_detector)
 
-    K = 10
+    K_e = 25
+    K_i = 10
     d = 1.0
 
-    conn_dict = {"rule": "fixed_indegree", "indegree": K}
+    exc_conn_dict = {"rule": "fixed_indegree", "indegree": K_e}
+    inh_conn_dict = {"rule": "fixed_indegree", "indegree": K_i}
     exc_syn_dict = {"delay": d, "weight": float(J_exc)}
     inh_syn_dict = {"delay": d, "weight": -float(J_inh)}
 
-    nest.Connect(exc_neurons, exc_neurons, conn_dict, exc_syn_dict)
-    nest.Connect(exc_neurons, inh_neurons, conn_dict, exc_syn_dict)
-    nest.Connect(inh_neurons, exc_neurons, conn_dict, inh_syn_dict)
-    nest.Connect(inh_neurons, inh_neurons, conn_dict, inh_syn_dict)
+    nest.Connect(exc_neurons, exc_neurons, exc_conn_dict, exc_syn_dict)
+    nest.Connect(exc_neurons, inh_neurons, exc_conn_dict, exc_syn_dict)
+    nest.Connect(inh_neurons, exc_neurons, inh_conn_dict, inh_syn_dict)
+    nest.Connect(inh_neurons, inh_neurons, inh_conn_dict, inh_syn_dict)
 
     for neuron in exc_neurons:
         nest.SetStatus([neuron], {"V_m": dict_params["E_L"]+(dict_params["V_th"]-dict_params["E_L"])*numpy.random.rand()})
